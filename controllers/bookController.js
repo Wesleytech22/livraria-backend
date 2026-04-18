@@ -1,7 +1,6 @@
 const Book = require('../models/Book');
 
 const bookController = {
-    // GET /livros
     getBooks: async (req, res) => {
         try {
             const books = await Book.find().sort({ createdAt: -1 });
@@ -11,7 +10,6 @@ const bookController = {
         }
     },
 
-    // GET /livros/:id
     getBookById: async (req, res) => {
         try {
             const book = await Book.findById(req.params.id);
@@ -22,12 +20,10 @@ const bookController = {
         }
     },
 
-    // POST /livros
     createBook: async (req, res) => {
         try {
             const { titulo, autor, ano, preco } = req.body;
 
-            // Validação básica
             if (!titulo || !autor) {
                 return res.status(400).json({ mensagem: 'Título e autor são obrigatórios' });
             }
@@ -36,7 +32,9 @@ const bookController = {
                 titulo,
                 autor,
                 ano: ano || null,
-                preco: preco || 0
+                preco: preco || 0,
+                createdAt: new Date(),
+                updatedAt: new Date()
             });
 
             await newBook.save();
@@ -47,15 +45,20 @@ const bookController = {
         }
     },
 
-    // PUT /livros/:id
     updateBook: async (req, res) => {
         try {
             const { titulo, autor, ano, preco } = req.body;
 
             const updatedBook = await Book.findByIdAndUpdate(
                 req.params.id,
-                { titulo, autor, ano, preco, updatedAt: Date.now() },
-                { new: true, runValidators: true }
+                {
+                    titulo,
+                    autor,
+                    ano,
+                    preco,
+                    updatedAt: new Date()
+                },
+                { new: true }
             );
 
             if (!updatedBook) {
@@ -69,7 +72,6 @@ const bookController = {
         }
     },
 
-    // DELETE /livros/:id
     deleteBook: async (req, res) => {
         try {
             const deletedBook = await Book.findByIdAndDelete(req.params.id);
